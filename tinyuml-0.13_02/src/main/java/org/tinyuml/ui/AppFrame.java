@@ -80,6 +80,7 @@ implements EditorStateListener, AppCommandListener, SelectionListener {
   private JTabbedPane tabbedPane;
   private JLabel coordLabel = new JLabel("    ");
   private JLabel memLabel = new JLabel("    ");
+  private JLabel elementCountLabel = new JLabel("Total Items: 0");
   private UmlModel umlModel;
   private DiagramEditor currentEditor;
   private transient Timer timer = new Timer();
@@ -241,6 +242,7 @@ implements EditorStateListener, AppCommandListener, SelectionListener {
   private void installStatusbar() {
     JPanel statusbar = new JPanel(new BorderLayout());
     statusbar.add(coordLabel, BorderLayout.WEST);
+    statusbar.add(elementCountLabel, BorderLayout.CENTER);
     statusbar.add(memLabel, BorderLayout.EAST);
     getContentPane().add(statusbar, BorderLayout.SOUTH);
   }
@@ -303,6 +305,26 @@ implements EditorStateListener, AppCommandListener, SelectionListener {
     menumanager.enableMenuItem("REDO", editor.canRedo());
     toolbarmanager.enableButton("UNDO", editor.canUndo());
     toolbarmanager.enableButton("REDO", editor.canRedo());
+    updateElementCount();
+  }
+
+  /**
+   * Updates the element count label in the status bar with current diagram statistics.
+   */
+  private void updateElementCount() {
+    if (currentEditor != null && currentEditor.getDiagram() instanceof StructureDiagram) {
+      StructureDiagram diagram = (StructureDiagram) currentEditor.getDiagram();
+      java.util.Map<String, Integer> counts = diagram.getElementCountByCategory();
+      int total = diagram.getTotalElementCount();
+      
+      StringBuilder sb = new StringBuilder();
+      sb.append("Total Items: ").append(String.format("%02d", total));
+      sb.append("; Package:").append(String.format("%02d", counts.get("Package")));
+      sb.append(", Class:").append(String.format("%02d", counts.get("Class")));
+      sb.append("; Component: ").append(String.format("%02d", counts.get("Component")));
+      
+      elementCountLabel.setText(sb.toString());
+    }
   }
 
   // ************************************************************************
@@ -629,7 +651,7 @@ implements EditorStateListener, AppCommandListener, SelectionListener {
 	  if(hasSelection)
 	    lastCopiedElements = getCurrentEditor().getSelectedElements();
 
-	  //adicionalmente, hay que habilitar el botón PASTE!
+	  //adicionalmente, hay que habilitar el botï¿½n PASTE!
 	  menumanager.enableMenuItem("PASTE", hasSelection);
 	  toolbarmanager.enableButton("PASTE", hasSelection);
   }

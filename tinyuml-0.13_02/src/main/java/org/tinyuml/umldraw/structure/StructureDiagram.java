@@ -497,4 +497,39 @@ implements NodeChangeListener, LabelSource, Diagram {
   public void removeNodeChangeListener(NodeChangeListener l) {
     nodeChangeListeners.remove(l);
   }
+
+  /**
+   * Counts the number of elements by category in the diagram.
+   * @return a Map with element types as keys and their counts as values
+   */
+  public java.util.Map<String, Integer> getElementCountByCategory() {
+    java.util.Map<String, Integer> counts = new java.util.HashMap<String, Integer>();
+    counts.put("Package", 0);
+    counts.put("Class", 0);
+    counts.put("Component", 0);
+    counts.put("Note", 0);
+    
+    List<DiagramElement> allChildren = super.getChildren();
+    for (DiagramElement element : allChildren) {
+      String className = element.getClass().getSimpleName();
+      if (className.equals("PackageElement")) {
+        counts.put("Package", counts.get("Package") + 1);
+      } else if (className.equals("ClassElement")) {
+        counts.put("Class", counts.get("Class") + 1);
+      } else if (className.equals("ComponentElement")) {
+        counts.put("Component", counts.get("Component") + 1);
+      } else if (className.equals("NoteElement")) {
+        counts.put("Note", counts.get("Note") + 1);
+      }
+    }
+    return counts;
+  }
+
+  /**
+   * Gets the total count of all elements in the diagram.
+   * @return the total number of elements
+   */
+  public int getTotalElementCount() {
+    return super.getChildren().size();
+  }
 }
